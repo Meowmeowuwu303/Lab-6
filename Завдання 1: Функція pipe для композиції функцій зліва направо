@@ -1,0 +1,44 @@
+const pipe = (...fns) => {
+  // Перевіряємо, чи всі аргументи є функціями
+  for (const fn of fns) {
+    if (typeof fn !== 'function') {
+      throw new Error('Всі аргументи pipe повинні бути функціями');
+    }
+  }
+  
+  // Повертаємо нову функцію, яка приймає початкове значення
+  return (x) => {
+    // Послідовно застосовуємо всі функції до значення
+    return fns.reduce((acc, fn) => fn(acc), x);
+  };
+};
+
+// Приклади функцій для тестування
+const inc = x => ++x;
+const twice = x => x * 2;
+const cube = x => x ** 3;
+
+// Тести для pipe
+console.log('=== Тести для pipe ===\n');
+
+// Тест 1: Композиція inc, twice, cube
+const f = pipe(inc, twice, cube);
+console.log('const f = pipe(inc, twice, cube);');
+console.log('f(5) =', f(5)); // (5 + 1) * 2 = 12, 12 ** 3 = 1728
+console.log('Очікується: 1728\n');
+
+// Тест 2: Композиція inc, inc
+const g = pipe(inc, inc);
+console.log('const g = pipe(inc, inc);');
+console.log('g(7) =', g(7)); // 7 + 1 + 1 = 9
+console.log('Очікується: 9\n');
+
+// Тест 3: Перевірка помилки при передачі не-функції
+console.log('Тест з помилкою:');
+try {
+  const h = pipe(inc, 7, cube);
+  console.log('h(5) =', h(5));
+} catch (error) {
+  console.log('Помилка:', error.message);
+  console.log('✓ Правильно! pipe викинув помилку при передачі числа\n');
+}
